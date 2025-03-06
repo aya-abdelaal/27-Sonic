@@ -18,7 +18,7 @@ public class UserRepository extends MainRepository<User> {
 
     @Override
     protected String getDataPath() {
-        return "../data/users.json"; // Replace with actual data path
+        return "src/main/java/com/example/data/users.json"; // Replace with actual data path
     }
 
     @Override
@@ -28,6 +28,7 @@ public class UserRepository extends MainRepository<User> {
 
 
     public ArrayList<User> getUsers() {
+        System.out.println("weselt el function");
         return findAll();
     }
 
