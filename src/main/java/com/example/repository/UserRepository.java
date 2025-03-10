@@ -28,7 +28,6 @@ public class UserRepository extends MainRepository<User> {
 
 
     public ArrayList<User> getUsers() {
-        System.out.println("weselt el function");
         return findAll();
     }
 

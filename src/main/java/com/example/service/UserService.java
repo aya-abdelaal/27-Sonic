@@ -1,6 +1,8 @@
 package com.example.service;
 
+import com.example.model.Cart;
 import com.example.model.Order;
+import com.example.model.Product;
 import com.example.model.User;
 import com.example.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,12 +17,17 @@ import java.util.UUID;
 public class UserService extends MainService<User>{
     //The Dependency Injection Variables
     UserRepository userRepository;
+    CartService cartService;
+
+    ProductService productService;
 
 
     //The Constructor with the requried variables mapping the Dependency Injection.
     @Autowired
-    public  UserService (UserRepository userRepository){
+    public  UserService (UserRepository userRepository, CartService cartService, ProductService productService){
         this.userRepository = userRepository;
+        this.cartService = cartService;
+        this.productService = productService;
     }
 
     public User addUser(User user){
@@ -48,4 +55,48 @@ public class UserService extends MainService<User>{
         userRepository.deleteUserById(userId);
     }
 
+
+    public void addOrderToUser(UUID userId){
+        //get the cart
+        Cart userCart = cartService.getCartByUserId(userId);
+
+        //create order
+        double totalPrice = 0;
+        List<Product> products = userCart.getProducts();
+        for(Product p: products){
+            totalPrice += p.getPrice();
+
+        }
+
+        Order newOrder = new Order(userId,totalPrice, products);
+
+        //save order to user
+        userRepository.addOrderToUser(userId, newOrder);
+
+        //empty cart
+        for(Product p: userCart.getProducts()){
+            cartService.deleteProductFromCart(userCart.getId(), p);
+        }
+
+
+
+    }
+
+    public void emptyCart(UUID userId){
+        Cart userCart = cartService.getCartByUserId(userId);
+
+        for(Product p: userCart.getProducts()){
+            cartService.deleteProductFromCart(userCart.getId(), p);
+        }
+    }
+
+    public void addProductToCart(UUID userId, UUID pId){
+        Cart userCart = cartService.getCartByUserId(userId);
+        cartService.addProductToCart(userCart.getId(), productService.getProductById(pId));
+    }
+
+    public void deleteProductFromCart(UUID userId, UUID pId){
+        Cart userCart = cartService.getCartByUserId(userId);
+        cartService.deleteProductFromCart(userCart.getId(), productService.getProductById(pId));
+    }
 }

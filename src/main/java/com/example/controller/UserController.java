@@ -42,11 +42,6 @@ public class UserController {
         return userService.getOrdersByUserId(userId);
     }
 
-    @PostMapping("/{userId}/checkout")
-    public String addOrderToUser(@PathVariable UUID userId){
-        return  null;
-    }
-
     @PostMapping("/{userId}/removeOrder")
     public String removeOrderFromUser(@PathVariable UUID userId, @RequestParam UUID orderId){
          userService.removeOrderFromUser(userId, orderId);
@@ -56,7 +51,31 @@ public class UserController {
     @DeleteMapping("/delete/{userId}")
     public String deleteUserById(@PathVariable UUID userId){
          userService.deleteUserById(userId);
-         return "Success";
+         return "User deleted succesfully";
+    }
+
+    @PostMapping("/{userId}/checkout")
+    public String addOrderToUser(@PathVariable UUID userId){
+        userService.addOrderToUser(userId);
+        return "Order added successfully";
+    }
+
+    @DeleteMapping("/{userId}/emptyCart")
+    public String emptyCart(@PathVariable UUID userId){
+        userService.emptyCart(userId);
+        return "Success";
+    }
+
+    @PutMapping("/addProductToCart")
+    public String addProductToCart(@RequestParam UUID userId, @RequestParam UUID productId){
+        userService.addProductToCart(userId, productId);
+        return "Success";
+    }
+
+    @PutMapping("/deleteProductFromCart")
+    public String deleteProductFromCart(@RequestParam UUID userId, @RequestParam UUID productId){
+        userService.deleteProductFromCart(userId, productId);
+        return "Success";
     }
 
 

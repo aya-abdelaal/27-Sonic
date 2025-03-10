@@ -2,6 +2,7 @@ package com.example.controller;
 
 import com.example.model.Order;
 import com.example.service.OrderService;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
@@ -25,6 +26,7 @@ public class OrderController {
     @PostMapping("/")
     public void addOrder(@RequestBody Order order) {
         orderService.addOrder(order);
+
     }
 
     // Get an order by ID
