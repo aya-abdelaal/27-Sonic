@@ -43,12 +43,16 @@ public class ProductController {
     @PutMapping("/applyDiscount")
     public String applyDiscount(@RequestParam double discount,@RequestBody ArrayList<UUID> productIds){
         productService.applyDiscount(discount, productIds);
-        return "Success";
+        return "Discount applied successfully";
     }
     @DeleteMapping("/delete/{productId}")
     public String deleteProductById(@PathVariable UUID productId) {
+        try{
         productService.deleteProductById(productId);
-        return "Success";
+        return "Product deleted successfully";}
+        catch (IllegalArgumentException e) {
+            return e.getMessage();
+        }
     }
 
 

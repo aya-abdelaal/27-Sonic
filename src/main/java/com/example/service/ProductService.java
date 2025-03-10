@@ -32,6 +32,8 @@ public class ProductService extends MainService<Product> {
         productRepository.applyDiscount(discount, productIds);
     }
     public void deleteProductById(UUID productId){
+        if(productRepository.getProductById(productId) == null)
+            throw  new IllegalArgumentException("Product not found");
         productRepository.deleteProductById(productId);
     }
 

@@ -26,7 +26,13 @@ public class CartService extends MainService<Cart>{
         return cartRepository.getCarts();
     }
     public Cart getCartById(UUID cartId){
-        return cartRepository.getCartById(cartId);
+        Cart cart =  cartRepository.getCartById(cartId);
+        if(cart == null){
+
+                throw new IllegalArgumentException("Cart not found");
+
+        }
+        return cart;
     }
     public Cart getCartByUserId(UUID userId){
         return cartRepository.getCartByUserId(userId);
@@ -38,6 +44,13 @@ public class CartService extends MainService<Cart>{
         cartRepository.deleteProductFromCart(cartId, product);
     }
     public void deleteCartById(UUID cartId){
+
+        Cart cart =  cartRepository.getCartById(cartId);
+        if(cart == null){
+
+            throw new IllegalArgumentException("Cart not found");
+
+        }
         cartRepository.deleteCartById(cartId);
     }
 }

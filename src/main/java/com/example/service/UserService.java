@@ -97,6 +97,13 @@ public class UserService extends MainService<User>{
 
     public void deleteProductFromCart(UUID userId, UUID pId){
         Cart userCart = cartService.getCartByUserId(userId);
-        cartService.deleteProductFromCart(userCart.getId(), productService.getProductById(pId));
+        if(userCart == null){
+            throw new IllegalArgumentException("Cart not found");
+        }
+        Product p =  productService.getProductById(pId);
+        if(p == null){
+            throw new IllegalArgumentException("Product not found");
+        }
+        cartService.deleteProductFromCart(userCart.getId(), p);
     }
 }

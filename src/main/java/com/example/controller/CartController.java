@@ -29,17 +29,27 @@ public class CartController {
     }
     @GetMapping("/{cartId}")
     public Cart getCartById(@PathVariable UUID cartId){
-        return cartService.getCartById(cartId);
+
+        try {
+            return cartService.getCartById(cartId);
+        }catch (IllegalArgumentException e) {
+            return null;
+        }
     }
     @PutMapping("/addProduct/{cartId}")
     public String addProductToCart(@PathVariable UUID cartId, @RequestBody Product product){
         cartService.addProductToCart(cartId, product);
-        return "Success";
+        return "Product added successfully";
     }
     @DeleteMapping("/delete/{cartId}")
     public String deleteCartById(@PathVariable UUID cartId){
-        cartService.deleteCartById(cartId);
-        return "Success";
+        try {
+            cartService.deleteCartById(cartId);
+            return "Cart deleted successfully";
+        }catch (IllegalArgumentException e) {
+            return e.getMessage();
+        }
+
     }
 
 }

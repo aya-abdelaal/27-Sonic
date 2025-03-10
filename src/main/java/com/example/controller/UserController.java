@@ -69,13 +69,18 @@ public class UserController {
     @PutMapping("/addProductToCart")
     public String addProductToCart(@RequestParam UUID userId, @RequestParam UUID productId){
         userService.addProductToCart(userId, productId);
-        return "Success";
+        return "Product added successfully";
     }
 
     @PutMapping("/deleteProductFromCart")
     public String deleteProductFromCart(@RequestParam UUID userId, @RequestParam UUID productId){
+        try{
         userService.deleteProductFromCart(userId, productId);
-        return "Success";
+        return "Product deleted from cart";
+        }
+        catch (IllegalArgumentException e) {
+            return e.getMessage();
+        }
     }
 
 

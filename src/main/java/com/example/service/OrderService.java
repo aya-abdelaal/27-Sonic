@@ -35,7 +35,7 @@ public class OrderService extends MainService<Order> {
     public Order getOrderById(UUID orderId) {
         Order order = orderRepository.getOrderById(orderId);
         if (order == null) {
-            throw new IllegalArgumentException("Order not found with ID: " + orderId);
+            throw new IllegalArgumentException("Order not found");
         }
         return order;
     }
@@ -44,7 +44,7 @@ public class OrderService extends MainService<Order> {
     public void deleteOrderById(UUID orderId) {
         Order order = orderRepository.getOrderById(orderId);
         if (order == null) {
-            throw new IllegalArgumentException("Order not found with ID: " + orderId);
+            throw new IllegalArgumentException("Order not found");
         }
         orderRepository.deleteOrderById(orderId);
     }
