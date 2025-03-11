@@ -15,6 +15,8 @@ import java.util.UUID;
 @Service
 @SuppressWarnings("rawtypes")
 public class UserService extends MainService<User>{
+    private final Cart cart;
+    private final User user;
     //The Dependency Injection Variables
     UserRepository userRepository;
     CartService cartService;
@@ -24,10 +26,12 @@ public class UserService extends MainService<User>{
 
     //The Constructor with the requried variables mapping the Dependency Injection.
     @Autowired
-    public  UserService (UserRepository userRepository, CartService cartService, ProductService productService){
+    public  UserService (UserRepository userRepository, CartService cartService, ProductService productService, Cart cart, User user){
         this.userRepository = userRepository;
         this.cartService = cartService;
         this.productService = productService;
+        this.cart = cart;
+        this.user = user;
     }
 
     public User addUser(User user){
@@ -52,6 +56,12 @@ public class UserService extends MainService<User>{
     }
 
     public void deleteUserById(UUID userId){
+
+
+        if(userRepository.getUserById(userId) == null){
+
+            throw new IllegalArgumentException("User not found");
+        }
         userRepository.deleteUserById(userId);
     }
 
@@ -92,13 +102,18 @@ public class UserService extends MainService<User>{
 
     public void addProductToCart(UUID userId, UUID pId){
         Cart userCart = cartService.getCartByUserId(userId);
+
+        if(userCart == null){
+            userCart = new Cart(userId,new ArrayList<Product>());
+            cartService.addCart(userCart);
+        }
         cartService.addProductToCart(userCart.getId(), productService.getProductById(pId));
     }
 
     public void deleteProductFromCart(UUID userId, UUID pId){
         Cart userCart = cartService.getCartByUserId(userId);
         if(userCart == null){
-            throw new IllegalArgumentException("Cart not found");
+            throw new IllegalArgumentException("Cart is empty");
         }
         Product p =  productService.getProductById(pId);
         if(p == null){

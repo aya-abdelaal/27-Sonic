@@ -12,9 +12,9 @@ import java.util.UUID;
 @Service
 @SuppressWarnings("rawtypes")
 public class CartService extends MainService<Cart>{
-//The Dependency Injection Variables
+    //The Dependency Injection Variables
     CartRepository cartRepository;
-//The Constructor with the requried variables mapping the Dependency Injection.
+    //The Constructor with the requried variables mapping the Dependency Injection.
     @Autowired
     public CartService(CartRepository cartRepository) {
         this.cartRepository = cartRepository;
@@ -29,7 +29,7 @@ public class CartService extends MainService<Cart>{
         Cart cart =  cartRepository.getCartById(cartId);
         if(cart == null){
 
-                throw new IllegalArgumentException("Cart not found");
+            throw new IllegalArgumentException("Cart not found");
 
         }
         return cart;
@@ -41,6 +41,10 @@ public class CartService extends MainService<Cart>{
         cartRepository.addProductToCart(cartId, product);
     }
     public void deleteProductFromCart(UUID cartId, Product product){
+        Cart userCart = getCartById(cartId);
+        if(userCart == null){
+            throw new IllegalArgumentException("Cart is empty");
+        }
         cartRepository.deleteProductFromCart(cartId, product);
     }
     public void deleteCartById(UUID cartId){

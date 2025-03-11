@@ -47,15 +47,16 @@ public class CartRepository extends MainRepository<Cart> {
                 .orElse(null);
     }
 
-    public void addProductToCart(UUID cartId, Product product) {
+    public Cart addProductToCart(UUID cartId, Product product) {
         ArrayList<Cart> carts = findAll();
         for (Cart cart : carts) {
             if (cart.getId().equals(cartId)) {
                 cart.getProducts().add(product);
                 saveAll(carts);
-                return;
+                return cart;
             }
         }
+        return null;
     }
 
     public void deleteProductFromCart(UUID cartId, Product product) {

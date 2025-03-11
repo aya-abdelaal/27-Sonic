@@ -45,13 +45,13 @@ public class UserController {
     @PostMapping("/{userId}/removeOrder")
     public String removeOrderFromUser(@PathVariable UUID userId, @RequestParam UUID orderId){
          userService.removeOrderFromUser(userId, orderId);
-         return "Success";
+         return "Order removed successfully";
     }
 
     @DeleteMapping("/delete/{userId}")
     public String deleteUserById(@PathVariable UUID userId){
          userService.deleteUserById(userId);
-         return "User deleted succesfully";
+         return "User deleted successfully";
     }
 
     @PostMapping("/{userId}/checkout")
@@ -63,12 +63,14 @@ public class UserController {
     @DeleteMapping("/{userId}/emptyCart")
     public String emptyCart(@PathVariable UUID userId){
         userService.emptyCart(userId);
-        return "Success";
+        return "Cart emptied successfully";
     }
 
     @PutMapping("/addProductToCart")
     public String addProductToCart(@RequestParam UUID userId, @RequestParam UUID productId){
         userService.addProductToCart(userId, productId);
+
+
         return "Product added successfully";
     }
 
