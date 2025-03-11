@@ -25,6 +25,7 @@ public class Order {
         this.userId = userId;
         this.totalPrice = totalPrice;
         this.products = products;
+        this.id = UUID.randomUUID();
     }
 
     public Order() {

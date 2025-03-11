@@ -44,20 +44,32 @@ public class UserController {
 
     @PostMapping("/{userId}/removeOrder")
     public String removeOrderFromUser(@PathVariable UUID userId, @RequestParam UUID orderId){
-         userService.removeOrderFromUser(userId, orderId);
-         return "Order removed successfully";
+        try {
+            userService.removeOrderFromUser(userId, orderId);
+            return "Order removed successfully";
+        }catch (IllegalArgumentException e){
+            return e.getMessage();
+        }
     }
 
     @DeleteMapping("/delete/{userId}")
     public String deleteUserById(@PathVariable UUID userId){
-         userService.deleteUserById(userId);
-         return "User deleted successfully";
+        try {
+            userService.deleteUserById(userId);
+            return "User deleted successfully";
+        }catch(IllegalArgumentException e){
+            return  e.getMessage();
+        }
     }
 
     @PostMapping("/{userId}/checkout")
     public String addOrderToUser(@PathVariable UUID userId){
-        userService.addOrderToUser(userId);
-        return "Order added successfully";
+        try {
+            userService.addOrderToUser(userId);
+            return "Order added successfully";
+        }catch (IllegalArgumentException e){
+            return e.getMessage();
+        }
     }
 
     @DeleteMapping("/{userId}/emptyCart")
@@ -69,9 +81,7 @@ public class UserController {
     @PutMapping("/addProductToCart")
     public String addProductToCart(@RequestParam UUID userId, @RequestParam UUID productId){
         userService.addProductToCart(userId, productId);
-
-
-        return "Product added successfully";
+        return "Product added to cart";
     }
 
     @PutMapping("/deleteProductFromCart")

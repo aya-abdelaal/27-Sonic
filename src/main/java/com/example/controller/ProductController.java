@@ -36,9 +36,13 @@ public class ProductController {
 
     @PutMapping("/update/{productId}")
     public Product updateProduct(@PathVariable UUID productId, @RequestBody Map<String, Object> body) {
-        String newName = (String) body.get("name");
-        double newPrice = Double.parseDouble(body.get("price").toString());
-        return productService.updateProduct(productId, newName, newPrice);
+        try {
+            String newName = (String) body.get("newName");
+            double newPrice = Double.parseDouble(body.get("newPrice").toString());
+            return productService.updateProduct(productId, newName, newPrice);
+        }catch (IllegalArgumentException e){
+            return null;
+        }
     }
     @PutMapping("/applyDiscount")
     public String applyDiscount(@RequestParam double discount,@RequestBody ArrayList<UUID> productIds){

@@ -8,6 +8,9 @@ import java.util.UUID;
 
 @Component
 public class Cart {
+
+
+
     private UUID id;
     private UUID userId;
     private List<Product> products = new ArrayList<>();
@@ -24,6 +27,7 @@ public class Cart {
     public Cart(UUID userId, List<Product> products) {
         this.userId = userId;
         this.products = products;
+        this.id = UUID.randomUUID();
     }
 
     public UUID getId() {

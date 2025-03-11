@@ -52,7 +52,17 @@ public class UserService extends MainService<User>{
     }
 
     public void removeOrderFromUser(UUID userId, UUID orderId){
-        userRepository.removeOrderFromUser(userId, orderId);
+        //check order exists
+        List<Order> orders = getOrdersByUserId(userId);
+        for(Order o:orders){
+            if(o.getId().equals(orderId)){
+                userRepository.removeOrderFromUser(userId, orderId);
+                return;
+            }
+        }
+
+        throw new IllegalArgumentException("Order not found");
+
     }
 
     public void deleteUserById(UUID userId){
@@ -69,13 +79,20 @@ public class UserService extends MainService<User>{
     public void addOrderToUser(UUID userId){
         //get the cart
         Cart userCart = cartService.getCartByUserId(userId);
+        System.out.println(userCart);
+        if(cart == null){
+            throw new IllegalArgumentException("Cart not found");
+        }
+
+        if(userCart.getProducts().size() == 0){
+            throw new IllegalArgumentException("Cart is empty");
+        }
 
         //create order
         double totalPrice = 0;
         List<Product> products = userCart.getProducts();
         for(Product p: products){
             totalPrice += p.getPrice();
-
         }
 
         Order newOrder = new Order(userId,totalPrice, products);
@@ -87,8 +104,6 @@ public class UserService extends MainService<User>{
         for(Product p: userCart.getProducts()){
             cartService.deleteProductFromCart(userCart.getId(), p);
         }
-
-
 
     }
 
@@ -104,8 +119,7 @@ public class UserService extends MainService<User>{
         Cart userCart = cartService.getCartByUserId(userId);
 
         if(userCart == null){
-            userCart = new Cart(userId,new ArrayList<Product>());
-            cartService.addCart(userCart);
+            userCart = createCart(userId);
         }
         cartService.addProductToCart(userCart.getId(), productService.getProductById(pId));
     }
@@ -120,5 +134,11 @@ public class UserService extends MainService<User>{
             throw new IllegalArgumentException("Product not found");
         }
         cartService.deleteProductFromCart(userCart.getId(), p);
+    }
+
+    public Cart createCart(UUID userId){
+        Cart userCart = new Cart(userId,new ArrayList<Product>());
+        cartService.addCart(userCart);
+        return userCart;
     }
 }
