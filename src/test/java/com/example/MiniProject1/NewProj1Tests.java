@@ -748,6 +748,569 @@ addCart(cart);
                 .andExpect(MockMvcResultMatchers.content().string("User not found"));
     }
 
+    //products tests
+
+    @Test
+    void testAddProductEndpoint1() throws Exception {
+        Product testProduct = new Product(UUID.randomUUID(), "New Product 1", 25.0);
+
+        mockMvc.perform(MockMvcRequestBuilders.post("/product/")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(testProduct)))
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.name").value("New Product 1"))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.price").value(25.0));
+    }
+
+    @Test
+    void testAddProductEndpoint2() throws Exception {
+        Product testProduct = new Product(UUID.randomUUID(), "New Product 2", 40.0);
+
+        mockMvc.perform(MockMvcRequestBuilders.post("/product/")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(testProduct)))
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.name").value("New Product 2"))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.price").value(40.0));
+    }
+
+    @Test
+    void testAddProductEndpoint3() throws Exception {
+        Product testProduct = new Product(UUID.randomUUID(), "New Product 3", 55.0);
+
+        mockMvc.perform(MockMvcRequestBuilders.post("/product/")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(testProduct)))
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.name").value("New Product 3"))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.price").value(55.0));
+    }
+
+
+    @Test
+    void testGetProductsEndpoint1() throws Exception {
+        mockMvc.perform(MockMvcRequestBuilders.get("/product/"))
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andExpect(MockMvcResultMatchers.jsonPath("$").isArray());
+    }
+
+    @Test
+    void testGetProductsEndpoint2() throws Exception {
+        Product testProduct1 = new Product(UUID.randomUUID(), "Test Product 1", 20.0);
+        Product testProduct2 = new Product(UUID.randomUUID(), "Test Product 2", 30.0);
+        addProduct(testProduct1);
+        addProduct(testProduct2);
+
+        mockMvc.perform(MockMvcRequestBuilders.get("/product/"))
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.length()").value(2));
+    }
+
+    @Test
+    void testGetProductsEndpoint3() throws Exception {
+        mockMvc.perform(MockMvcRequestBuilders.get("/product/"))
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andExpect(MockMvcResultMatchers.jsonPath("$").isEmpty());
+    }
+
+
+    @Test
+    void testGetProductByIdEndpoint1() throws Exception {
+        Product testProduct = new Product(UUID.randomUUID(), "Test Product", 10.0);
+        addProduct(testProduct);
+
+        mockMvc.perform(MockMvcRequestBuilders.get("/product/{productId}", testProduct.getId()))
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andExpect(MockMvcResultMatchers.content().json(objectMapper.writeValueAsString(testProduct)));
+    }
+    @Test
+    void testGetProductByIdEndpoint2() throws Exception {
+        Product testProduct = new Product(UUID.randomUUID(), "Test Product", 12.5);
+        addProduct(testProduct);
+
+        mockMvc.perform(MockMvcRequestBuilders.get("/product/{productId}", testProduct.getId()))
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andExpect(MockMvcResultMatchers.content().json(objectMapper.writeValueAsString(testProduct)));
+    }
+
+    @Test
+    void testGetProductByIdEndpoint3() throws Exception {
+        Product testProduct = new Product(UUID.randomUUID(), "Test Product", 18.0);
+        addProduct(testProduct);
+
+        mockMvc.perform(MockMvcRequestBuilders.get("/product/{productId}", testProduct.getId()))
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andExpect(MockMvcResultMatchers.content().json(objectMapper.writeValueAsString(testProduct)));
+    }
+
+    @Test
+    void testUpdateProductEndpoint1() throws Exception {
+        Product testProduct = new Product(UUID.randomUUID(), "Test Product", 10.0);
+        addProduct(testProduct);
+        Map<String, Object> body = new HashMap<>();
+        body.put("newName", "Updated Product");
+        body.put("newPrice", 20.0);
+
+        mockMvc.perform(MockMvcRequestBuilders.put("/product/update/{id}", testProduct.getId())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(body)))
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.name").value("Updated Product"))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.price").value(20.0));
+    }
+
+    @Test
+    void testUpdateProductEndpoint2() throws Exception {
+        Map<String, Object> body = new HashMap<>();
+        body.put("newName", "Non-Existent Product");
+        body.put("newPrice", 50.0);
+
+        mockMvc.perform(MockMvcRequestBuilders.put("/product/update/{id}", UUID.randomUUID())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(body)))
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andExpect(MockMvcResultMatchers.content().string(""));
+    }
+
+    @Test
+    void testUpdateProductEndpoint3() throws Exception {
+        Product testProduct = new Product(UUID.randomUUID(), "Old Product", 5.0);
+        addProduct(testProduct);
+        Map<String, Object> body = new HashMap<>();
+        body.put("newPrice", 15.0);
+
+        mockMvc.perform(MockMvcRequestBuilders.put("/product/update/{id}", testProduct.getId())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(body)))
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.price").value(15.0));
+    }
+
+    @Test
+    void testApplyDiscountEndpoint1() throws Exception {
+        Product testProduct = new Product(UUID.randomUUID(), "Test Product", 10.0);
+        addProduct(testProduct);
+        ArrayList<UUID> productIds = new ArrayList<>();
+        productIds.add(testProduct.getId());
+
+        mockMvc.perform(MockMvcRequestBuilders.put("/product/applyDiscount")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .param("discount", "10.0")
+                        .content(objectMapper.writeValueAsString(productIds)))
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andExpect(MockMvcResultMatchers.content().string("Discount applied successfully"));
+    }
+
+    @Test
+    void testApplyDiscountEndpoint2() throws Exception {
+        ArrayList<UUID> productIds = new ArrayList<>();
+        productIds.add(UUID.randomUUID());
+
+        mockMvc.perform(MockMvcRequestBuilders.put("/product/applyDiscount")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .param("discount", "5.0")
+                        .content(objectMapper.writeValueAsString(productIds)))
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andExpect(MockMvcResultMatchers.content().string("Discount applied successfully"));
+    }
+
+    @Test
+    void testApplyDiscountEndpoint3() throws Exception {
+        Product testProduct = new Product(UUID.randomUUID(), "Another Product", 30.0);
+        addProduct(testProduct);
+        ArrayList<UUID> productIds = new ArrayList<>();
+        productIds.add(testProduct.getId());
+
+        mockMvc.perform(MockMvcRequestBuilders.put("/product/applyDiscount")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .param("discount", "15.0")
+                        .content(objectMapper.writeValueAsString(productIds)))
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andExpect(MockMvcResultMatchers.content().string("Discount applied successfully"));
+    }
+
+
+    @Test
+    void testDeleteProductByIdEndPoint1() throws Exception {
+        Product testProduct = new Product(UUID.randomUUID(), "Test Product", 10.0);
+        addProduct(testProduct);
+
+        mockMvc.perform(MockMvcRequestBuilders.delete("/product/delete/{id}", testProduct.getId()))
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andExpect(MockMvcResultMatchers.content().string("Product deleted successfully"));
+    }
+
+    @Test
+    void testDeleteProductByIdEndPoint2() throws Exception {
+        Product testProduct = new Product(UUID.randomUUID(), "Another Product", 20.0);
+        addProduct(testProduct);
+
+        mockMvc.perform(MockMvcRequestBuilders.delete("/product/delete/{id}", testProduct.getId()))
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andExpect(MockMvcResultMatchers.content().string("Product deleted successfully"));
+    }
+
+    @Test
+    void testDeleteProductByIdEndPoint3() throws Exception {
+        Product testProduct = new Product(UUID.randomUUID(), "Special Product", 50.0);
+        addProduct(testProduct);
+
+        mockMvc.perform(MockMvcRequestBuilders.delete("/product/delete/{id}", testProduct.getId()))
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andExpect(MockMvcResultMatchers.content().string("Product deleted successfully"));
+    }
+
+
+
+
+    //cart tests
+    @Test
+    void testAddCartEndPoint1() throws Exception {
+        User testUser = new User();
+        testUser.setId(UUID.randomUUID());
+        testUser.setName("Test User 1");
+        addUser(testUser);
+
+        mockMvc.perform(MockMvcRequestBuilders.post("/cart/")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(new Cart(UUID.randomUUID(), testUser.getId(), new ArrayList<>())))
+                )
+                .andExpect(MockMvcResultMatchers.status().isOk());
+    }
+
+    @Test
+    void testAddCartEndPoint2() throws Exception {
+        User testUser = new User();
+        testUser.setId(UUID.randomUUID());
+        testUser.setName("Test User 2");
+        addUser(testUser);
+
+        mockMvc.perform(MockMvcRequestBuilders.post("/cart/")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(new Cart(UUID.randomUUID(), testUser.getId(), new ArrayList<>())))
+                )
+                .andExpect(MockMvcResultMatchers.status().isOk());
+    }
+
+    @Test
+    void testAddCartEndPoint3() throws Exception {
+        User testUser = new User();
+        testUser.setId(UUID.randomUUID());
+        testUser.setName("Test User 3");
+        addUser(testUser);
+
+        mockMvc.perform(MockMvcRequestBuilders.post("/cart/")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(new Cart(UUID.randomUUID(), testUser.getId(), new ArrayList<>())))
+                )
+                .andExpect(MockMvcResultMatchers.status().isOk());
+    }
+
+    @Test
+    void testGetCartsEndPoint1() throws Exception {
+
+
+        MvcResult result = mockMvc.perform(MockMvcRequestBuilders.get("/cart/")
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andReturn();
+
+        String responseContent = result.getResponse().getContentAsString();
+        List<Cart> responseCarts = objectMapper.readValue(responseContent, new TypeReference<List<Cart>>() {});
+        assertEquals(0, responseCarts.size(), "Carts should be returned correctly From Endpoint");
+    }
+
+    @Test
+    void testGetCartsEndPoint2() throws Exception {
+        Cart cart = new Cart(UUID.randomUUID(), UUID.randomUUID(), new ArrayList<>());
+        addCart(cart);
+
+        MvcResult result = mockMvc.perform(MockMvcRequestBuilders.get("/cart/")
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andReturn();
+
+        String responseContent = result.getResponse().getContentAsString();
+        List<Cart> responseCarts = objectMapper.readValue(responseContent, new TypeReference<List<Cart>>() {});
+        assertEquals(1, responseCarts.size(), "Carts should be returned correctly From Endpoint");
+    }
+
+    @Test
+    void testGetCartsEndPoint3() throws Exception {
+        Cart cart1 = new Cart(UUID.randomUUID(), UUID.randomUUID(), new ArrayList<>());
+        Cart cart2 = new Cart(UUID.randomUUID(), UUID.randomUUID(), new ArrayList<>());
+        Cart cart3 = new Cart(UUID.randomUUID(), UUID.randomUUID(), new ArrayList<>());
+        addCart(cart1);
+        addCart(cart2);
+        addCart(cart3);
+
+        MvcResult result = mockMvc.perform(MockMvcRequestBuilders.get("/cart/")
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andReturn();
+
+        String responseContent = result.getResponse().getContentAsString();
+        List<Cart> responseCarts = objectMapper.readValue(responseContent, new TypeReference<List<Cart>>() {});
+        assertEquals(3, responseCarts.size(), "Carts should be returned correctly From Endpoint");
+    }
+
+    @Test
+    void testGetCartByIdEndPoint1() throws Exception {
+        Cart cart = new Cart(UUID.randomUUID(), UUID.randomUUID(), new ArrayList<>());
+        addCart(cart);
+
+        mockMvc.perform(MockMvcRequestBuilders.get("/cart/{id}", cart.getId()))
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andExpect(MockMvcResultMatchers.content().json(objectMapper.writeValueAsString(cart)));
+    }
+
+    @Test
+    void testGetCartByIdEndPoint2() throws Exception {
+        Cart cart = new Cart(UUID.randomUUID(), UUID.randomUUID(), new ArrayList<>());
+        addCart(cart);
+
+        mockMvc.perform(MockMvcRequestBuilders.get("/cart/{id}", cart.getId()))
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andExpect(MockMvcResultMatchers.content().json(objectMapper.writeValueAsString(cart)));
+    }
+
+    @Test
+    void testGetCartByIdEndPoint3() throws Exception {
+        Cart cart = new Cart(UUID.randomUUID(), UUID.randomUUID(), new ArrayList<>());
+        addCart(cart);
+
+        mockMvc.perform(MockMvcRequestBuilders.get("/cart/{id}", cart.getId()))
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andExpect(MockMvcResultMatchers.content().json(objectMapper.writeValueAsString(cart)));
+    }
+    @Test
+    void testAddProductToCartByCartIDEndPoint1() throws Exception {
+        // Create and persist a test cart
+        Cart testCart = new Cart(UUID.randomUUID(), UUID.randomUUID(), new ArrayList<>());
+        addCart(testCart);  // Ensure this actually persists the cart
+
+        // Create and persist a test product
+        Product testProduct = new Product(UUID.randomUUID(), "Test Product1", 10.0);
+        addProduct(testProduct); // Ensure product is available
+
+        // Perform the PUT request
+        mockMvc.perform(MockMvcRequestBuilders.put("/cart/addProduct/{cartId}", testCart.getId())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(testProduct)))
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andExpect(MockMvcResultMatchers.content().string("Product added successfully"));
+    }
+
+
+    @Test
+    void testAddProductToCartByCartIDEndPoint2() throws Exception {
+        Cart testCart = new Cart(UUID.randomUUID(), UUID.randomUUID(), new ArrayList<>());
+        addCart(testCart);  // Ensure this actually persists the cart
+
+        // Create and persist a test product
+        Product testProduct = new Product(UUID.randomUUID(), "Test Product2", 100.0);
+        addProduct(testProduct); // Ensure product is available
+
+        // Perform the PUT request
+        mockMvc.perform(MockMvcRequestBuilders.put("/cart/addProduct/{cartId}", testCart.getId())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(testProduct)))
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andExpect(MockMvcResultMatchers.content().string("Product added successfully"));
+    }
+
+    @Test
+    void testAddProductToCartByCartIDEndPoint3() throws Exception {
+        Cart testCart = new Cart(UUID.randomUUID(), UUID.randomUUID(), new ArrayList<>());
+        addCart(testCart);  // Ensure this actually persists the cart
+
+        // Create and persist a test product
+        Product testProduct = new Product(UUID.randomUUID(), "Test Product3", 120.0);
+        addProduct(testProduct); // Ensure product is available
+
+        // Perform the PUT request
+        mockMvc.perform(MockMvcRequestBuilders.put("/cart/addProduct/{cartId}", testCart.getId())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(testProduct)))
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andExpect(MockMvcResultMatchers.content().string("Product added successfully"));
+    }
+    @Test
+    void testDeleteCartByIdEndPoint1() throws Exception {
+        Cart cart = new Cart(UUID.randomUUID(), UUID.randomUUID(), new ArrayList<>());
+        addCart(cart);
+
+        mockMvc.perform(MockMvcRequestBuilders.delete("/cart/delete/{id}", cart.getId()))
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andExpect(MockMvcResultMatchers.content().string("Cart deleted successfully"));
+    }
+
+    @Test
+    void testDeleteCartByIdEndPoint2() throws Exception {
+        Cart cart = new Cart(UUID.randomUUID(), UUID.randomUUID(), new ArrayList<>());
+        addCart(cart);
+
+        mockMvc.perform(MockMvcRequestBuilders.delete("/cart/delete/{id}", cart.getId()))
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andExpect(MockMvcResultMatchers.content().string("Cart deleted successfully"));
+    }
+
+    @Test
+    void testDeleteCartByIdEndPoint3() throws Exception {
+
+        Cart cart = new Cart(UUID.randomUUID(), UUID.randomUUID(), new ArrayList<>());
+        addCart(cart);
+
+        mockMvc.perform(MockMvcRequestBuilders.delete("/cart/delete/{id}", cart.getId()))
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andExpect(MockMvcResultMatchers.content().string("Cart deleted successfully"));
+    }
+    @Test
+    void testAddOrderEndPoint1() throws Exception {
+        Order order = new Order(UUID.randomUUID(), UUID.randomUUID(), 10.0, new ArrayList<>());
+        mockMvc.perform(MockMvcRequestBuilders.post("/order/")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(order)))
+                .andExpect(MockMvcResultMatchers.status().isOk());
+        boolean found = false;
+        for (Order o : getOrders()) {
+            if (o.getId().equals(order.getId())) {
+                found = true;
+                break;
+            }
+        }
+        assertTrue(found, "Order should be added correctly from Endpoint");
+    }
+
+    @Test
+    void testAddOrderEndPoint2() throws Exception {
+        Order order = new Order(UUID.randomUUID(), UUID.randomUUID(), 15.0, new ArrayList<>());
+        mockMvc.perform(MockMvcRequestBuilders.post("/order/")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(order)))
+                .andExpect(MockMvcResultMatchers.status().isOk());
+        boolean found = false;
+        for (Order o : getOrders()) {
+            if (o.getId().equals(order.getId())) {
+                found = true;
+                break;
+            }
+        }
+        assertTrue(found, "Order should be added correctly from Endpoint");
+    }
+
+    @Test
+    void testAddOrderEndPoint3() throws Exception {
+        Order order = new Order(UUID.randomUUID(), UUID.randomUUID(), 20.0, new ArrayList<>());
+        mockMvc.perform(MockMvcRequestBuilders.post("/order/")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(order)))
+                .andExpect(MockMvcResultMatchers.status().isOk());
+        boolean found = false;
+        for (Order o : getOrders()) {
+            if (o.getId().equals(order.getId())) {
+                found = true;
+                break;
+            }
+        }
+        assertTrue(found, "Order should be added correctly from Endpoint");
+    }
+
+    @Test
+    void testGetOrdersEndPoint1() throws Exception {
+        Order order = new Order(UUID.randomUUID(), UUID.randomUUID(), 10.0, new ArrayList<>());
+        addOrder(order);
+        MvcResult result = mockMvc.perform(MockMvcRequestBuilders.get("/order/")
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andReturn();
+        String responseContent = result.getResponse().getContentAsString();
+        List<Order> responseOrders = objectMapper.readValue(responseContent, new TypeReference<List<Order>>() {});
+        assertEquals(getOrders().size(), responseOrders.size(), "Orders should be returned correctly From Endpoint");
+    }
+
+    @Test
+    void testGetOrdersEndPoint2() throws Exception {
+        Order order = new Order(UUID.randomUUID(), UUID.randomUUID(), 20.0, new ArrayList<>());
+        addOrder(order);
+        MvcResult result = mockMvc.perform(MockMvcRequestBuilders.get("/order/")
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andReturn();
+        String responseContent = result.getResponse().getContentAsString();
+        List<Order> responseOrders = objectMapper.readValue(responseContent, new TypeReference<List<Order>>() {});
+        assertEquals(getOrders().size(), responseOrders.size(), "Orders should be returned correctly From Endpoint");
+    }
+
+    @Test
+    void testGetOrdersEndPoint3() throws Exception {
+        Order order = new Order(UUID.randomUUID(), UUID.randomUUID(), 30.0, new ArrayList<>());
+        addOrder(order);
+        MvcResult result = mockMvc.perform(MockMvcRequestBuilders.get("/order/")
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andReturn();
+        String responseContent = result.getResponse().getContentAsString();
+        List<Order> responseOrders = objectMapper.readValue(responseContent, new TypeReference<List<Order>>() {});
+        assertEquals(getOrders().size(), responseOrders.size(), "Orders should be returned correctly From Endpoint");
+    }
+
+    @Test
+    void testGetOrderByIdEndPoint1() throws Exception {
+        Order order = new Order(UUID.randomUUID(), UUID.randomUUID(), 10.0, new ArrayList<>());
+        addOrder(order);
+        mockMvc.perform(MockMvcRequestBuilders.get("/order/{id}", order.getId()))
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andExpect(MockMvcResultMatchers.content().json(objectMapper.writeValueAsString(order)))
+                .andReturn();
+    }
+
+    @Test
+    void testGetOrderByIdEndPoint2() throws Exception {
+        Order order = new Order(UUID.randomUUID(), UUID.randomUUID(), 20.0, new ArrayList<>());
+        addOrder(order);
+        mockMvc.perform(MockMvcRequestBuilders.get("/order/{id}", order.getId()))
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andExpect(MockMvcResultMatchers.content().json(objectMapper.writeValueAsString(order)))
+                .andReturn();
+    }
+
+    @Test
+    void testGetOrderByIdEndPoint3() throws Exception {
+        Order order = new Order(UUID.randomUUID(), UUID.randomUUID(), 30.0, new ArrayList<>());
+        addOrder(order);
+        mockMvc.perform(MockMvcRequestBuilders.get("/order/{id}", order.getId()))
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andExpect(MockMvcResultMatchers.content().json(objectMapper.writeValueAsString(order)))
+                .andReturn();
+    }
+
+
+    @Test
+    void testDeleteOrderByIdEndPoint1() throws Exception {
+        Order order = new Order(UUID.randomUUID(), UUID.randomUUID(), 10.0, new ArrayList<>());
+        addOrder(order);
+        mockMvc.perform(MockMvcRequestBuilders.delete("/order/delete/{id}", order.getId()))
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andExpect(MockMvcResultMatchers.content().string("Order deleted successfully"));
+    }
+
+    @Test
+    void testDeleteOrderByIdEndPoint2() throws Exception {
+        Order order = new Order(UUID.randomUUID(), UUID.randomUUID(), 20.0, new ArrayList<>());
+        addOrder(order);
+        mockMvc.perform(MockMvcRequestBuilders.delete("/order/delete/{id}", order.getId()))
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andExpect(MockMvcResultMatchers.content().string("Order deleted successfully"));
+    }
+
+    @Test
+    void testDeleteOrderByIdEndPoint3() throws Exception {
+        mockMvc.perform(MockMvcRequestBuilders.delete("/order/delete/{id}", UUID.randomUUID()))
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andExpect(MockMvcResultMatchers.content().string("Order not found"));
+    }
+
 
 
 
