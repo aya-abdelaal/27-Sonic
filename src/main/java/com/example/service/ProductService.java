@@ -26,7 +26,10 @@ public class ProductService extends MainService<Product> {
         return productRepository.getProductById(productId);
     }
     public Product updateProduct(UUID productId, String newName, double newPrice){
-        return productRepository.updateProduct(productId, newName, newPrice);
+       if(getProductById(productId) ==null)
+           throw new IllegalArgumentException("Product not found");
+       return productRepository.updateProduct(productId, newName, newPrice);
+
     }
     public void applyDiscount(double discount, ArrayList<UUID> productIds){
         productRepository.applyDiscount(discount, productIds);
