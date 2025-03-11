@@ -80,8 +80,7 @@ public class UserController {
 
     @PutMapping("/addProductToCart")
     public String addProductToCart(@RequestParam UUID userId, @RequestParam UUID productId){
-        userService.addProductToCart(userId, productId);
-        return "Product added to cart";
+        return userService.addProductToCart(userId, productId);
     }
 
     @PutMapping("/deleteProductFromCart")

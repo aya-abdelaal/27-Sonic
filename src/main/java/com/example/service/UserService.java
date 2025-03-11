@@ -6,6 +6,7 @@ import com.example.model.Product;
 import com.example.model.User;
 import com.example.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -115,13 +116,21 @@ public class UserService extends MainService<User>{
         }
     }
 
-    public void addProductToCart(UUID userId, UUID pId){
+    public String addProductToCart(UUID userId, UUID pId){
         Cart userCart = cartService.getCartByUserId(userId);
-
-        if(userCart == null){
+        User user = userRepository.getUserById(userId);
+        if(user ==null){
+            return "User not found";
+        }
+        Product product = productService.getProductById(pId);
+        if(product==null){
+            return "Product not found";
+        }
+        if(userCart == null) {
             userCart = createCart(userId);
         }
-        cartService.addProductToCart(userCart.getId(), productService.getProductById(pId));
+        cartService.addProductToCart(userCart.getId(), product);
+        return "Product added to cart";
     }
 
     public void deleteProductFromCart(UUID userId, UUID pId){
