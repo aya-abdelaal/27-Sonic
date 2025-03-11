@@ -53,8 +53,8 @@ public class ProductController {
     @DeleteMapping("/delete/{productId}")
     public String deleteProductById(@PathVariable UUID productId) {
         try{
-        productService.deleteProductById(productId);
-        return "Product deleted successfully";}
+            productService.deleteProductById(productId);
+            return "Product deleted successfully";}
         catch (IllegalArgumentException e) {
             return e.getMessage();
         }

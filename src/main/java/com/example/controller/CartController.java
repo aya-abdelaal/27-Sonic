@@ -38,8 +38,12 @@ public class CartController {
     }
     @PutMapping("/addProduct/{cartId}")
     public String addProductToCart(@PathVariable UUID cartId, @RequestBody Product product){
-        cartService.addProductToCart(cartId, product);
-        return "Product added successfully";
+        try {
+            cartService.addProductToCart(cartId, product);
+            return "Product added successfully";
+        }catch (IllegalArgumentException e){
+           return e.getMessage();
+        }
     }
     @DeleteMapping("/delete/{cartId}")
     public String deleteCartById(@PathVariable UUID cartId){

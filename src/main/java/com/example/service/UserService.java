@@ -49,6 +49,9 @@ public class UserService extends MainService<User>{
     }
 
     public List<Order> getOrdersByUserId(UUID userId){
+//        if(getUserById(userId) == null)
+//            throw new IllegalArgumentException("User not found");
+
         return userRepository.getOrdersByUserId(userId);
     }
 
@@ -109,10 +112,14 @@ public class UserService extends MainService<User>{
     }
 
     public void emptyCart(UUID userId){
+        User user = getUserById(userId);
+        if(user == null)
+            throw new IllegalArgumentException("User not found");
         Cart userCart = cartService.getCartByUserId(userId);
-
-        for(Product p: userCart.getProducts()){
-            cartService.deleteProductFromCart(userCart.getId(), p);
+        if(cart != null) {
+            for (Product p : userCart.getProducts()) {
+                cartService.deleteProductFromCart(userCart.getId(), p);
+            }
         }
     }
 

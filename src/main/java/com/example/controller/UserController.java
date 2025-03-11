@@ -39,7 +39,12 @@ public class UserController {
 
     @GetMapping("/{userId}/orders")
     public List<Order> getOrdersByUserId(@PathVariable UUID userId){
-        return userService.getOrdersByUserId(userId);
+        try {
+            return userService.getOrdersByUserId(userId);
+        }catch (IllegalArgumentException e){
+            return  new ArrayList<>();
+
+        }
     }
 
     @PostMapping("/{userId}/removeOrder")
@@ -74,13 +79,21 @@ public class UserController {
 
     @DeleteMapping("/{userId}/emptyCart")
     public String emptyCart(@PathVariable UUID userId){
-        userService.emptyCart(userId);
-        return "Cart emptied successfully";
+        try {
+            userService.emptyCart(userId);
+            return "Cart emptied successfully";
+        }catch (IllegalArgumentException e){
+            return  e.getMessage();
+        }
     }
 
     @PutMapping("/addProductToCart")
     public String addProductToCart(@RequestParam UUID userId, @RequestParam UUID productId){
-        return userService.addProductToCart(userId, productId);
+        try {
+            return userService.addProductToCart(userId, productId);
+        }catch (IllegalArgumentException e){
+            return  e.getMessage();
+        }
     }
 
     @PutMapping("/deleteProductFromCart")
